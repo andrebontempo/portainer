@@ -1,0 +1,34 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:2.20.2
+    container_name: portainer
+    restart: always
+
+    # Mapeamento de portas:
+    # 9443: Porta para acesso HTTPS (recomendado)
+    # 9000: Porta para acesso HTTP (se usar Nginx Proxy Manager, não precisa expor a 9000 diretamente)
+    # 8000: Porta para o Edge Agent (se não for usar, pode remover)
+#    ports:
+#      - "9000:9000" # Porta HTTP
+#      - "9443:9443" # Porta HTTPS (Recomendado)
+#      - "8000:8000"
+
+    # Mapeamento de volumes (CRUCIAL para acesso ao Docker Socket e persistência de dados):
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Acesso ao Docker Daemon Host
+      - portainer_data:/data # Persistência dos dados do Portainer (usuários, configs)
+
+    # Conecta o Portainer à rede do seu Nginx Proxy Manager (NPM).
+    # Isso permite que você configure o NPM para expor o Portainer.
+    networks:
+      - proxy
+
+# Definição das Redes e Volumes
+networks:
+  # Referência à rede externa 'proxy' que já deve existir (criada pelo NPM ou por você)
+  proxy:
+    external: true
+
+volumes:
+  # Volume que o Portainer usará para armazenar seus dados
+  portainer_data:
